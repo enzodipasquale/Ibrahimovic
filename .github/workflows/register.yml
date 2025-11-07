@@ -1,0 +1,57 @@
+name: Register Player
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Register Ibrahimovic player
+      env:
+        GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
+      run: |
+        echo "🦁 Registering Ibrahimovic penalty player"
+        python <<'PY'
+        import os
+        import requests
+
+        PLAYER_NAME = "ibrahimovic"
+        GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+        SERVER_URL = os.getenv("SERVER_URL")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {GITHUB_TOKEN}"
+        }
+
+        payload = {"player_name": PLAYER_NAME}
+
+        response = requests.post(
+            f"{SERVER_URL}/register",
+            headers=headers,
+            json=payload,
+            timeout=10,
+        )
+
+        if response.ok:
+            print(f"✅ Player registered: {response.json()}")
+        else:
+            print(f"❌ Registration failed: {response.status_code} - {response.text}")
+        PY
+
