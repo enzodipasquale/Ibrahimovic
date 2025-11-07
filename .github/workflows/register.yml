@@ -1,0 +1,43 @@
+name: Register Player
+
+on:
+  workflow_dispatch:
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Register Ibrahimovic
+      env:
+        GAME_TOKEN: ${{ secrets.GAME_TOKEN }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
+        PLAYER_NAME: ibrahimovic
+      run: |
+        python - <<'PY'
+        import json
+        import os
+        import urllib.request
+
+        token = os.environ["GAME_TOKEN"]
+        url = os.environ["SERVER_URL"].rstrip("/") + "/register"
+        data = json.dumps({"player_name": os.environ["PLAYER_NAME"]}).encode()
+
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}",
+            },
+            method="POST",
+        )
+
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            print(resp.read().decode())
+        PY
+
