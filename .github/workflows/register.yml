@@ -22,6 +22,7 @@ jobs:
       run: pip install requests
 
     - name: Register Player
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
