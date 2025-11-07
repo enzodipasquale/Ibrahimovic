@@ -27,36 +27,6 @@ jobs:
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: |
         echo "🦁 Registering Ibrahimovic player"
-        python -c "
-        import requests
-        import os
-
-        PLAYER_NAME = 'ibrahimovic'
-        GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-        SERVER_URL = os.getenv('SERVER_URL')
-
-        if SERVER_URL and not SERVER_URL.startswith(('http://', 'https://')):
-            SERVER_URL = 'https://' + SERVER_URL.lstrip('/')
-
-        try:
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {GITHUB_TOKEN}'
-            }
-            data = {'player_name': PLAYER_NAME}
-
-            response = requests.post(f"{SERVER_URL.rstrip('/')}/register",
-                                   headers=headers,
-                                   json=data,
-                                   timeout=10)
-
-            if response.status_code == 200:
-                result = response.json()
-                print(f'✅ Player registered: {result}')
-            else:
-                print(f'❌ Registration failed: {response.status_code} - {response.text}')
-        except Exception as e:
-            print(f'❌ Registration error: {e}')
-        "
+        python register.py
 
 
