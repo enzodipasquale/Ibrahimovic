@@ -35,7 +35,12 @@ def main() -> None:
         json={"action": action},
         timeout=10,
     )
-    submission.raise_for_status()
+    try:
+        submission.raise_for_status()
+    except requests.HTTPError:
+        detail = submission.text or submission.reason
+        print(f"Submission failed: {submission.status_code} {detail}")
+        return
 
 
 if __name__ == "__main__":
