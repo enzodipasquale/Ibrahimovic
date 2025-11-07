@@ -11,13 +11,15 @@ import requests
 
 
 PLAYER_NAME: Final[str] = "ibrahimovic"
-SERVER_URL = os.getenv("SERVER_URL", "").strip()
+DEFAULT_SERVER_URL: Final[str] = "https://game-platform-v2-914970891924.us-central1.run.app"
+
+SERVER_URL = os.getenv("SERVER_URL", "").strip() or DEFAULT_SERVER_URL
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 
 
 def _normalise_server(url: str) -> str:
     if not url:
-        raise SystemExit("SERVER_URL environment variable not set")
+        raise SystemExit("SERVER_URL could not be determined")
     if not url.startswith(("http://", "https://")):
         url = "https://" + url.lstrip("/")
     return url.rstrip("/")
