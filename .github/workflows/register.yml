@@ -35,6 +35,9 @@ jobs:
         GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
         SERVER_URL = os.getenv('SERVER_URL')
 
+        if SERVER_URL and not SERVER_URL.startswith(('http://', 'https://')):
+            SERVER_URL = 'https://' + SERVER_URL.lstrip('/')
+
         try:
             headers = {
                 'Content-Type': 'application/json',
@@ -42,7 +45,7 @@ jobs:
             }
             data = {'player_name': PLAYER_NAME}
 
-            response = requests.post(f'{SERVER_URL}/register',
+            response = requests.post(f'{SERVER_URL.rstrip('/')}/register',
                                    headers=headers,
                                    json=data,
                                    timeout=10)
