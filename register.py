@@ -1,43 +1,27 @@
 #!/usr/bin/env python3
-"""Register the Ibrahimovic penalty shooter with the platform."""
-
-from __future__ import annotations
-
 import os
 import sys
-from typing import Final
 
 import requests
 
 
-PLAYER_NAME: Final[str] = "ibrahimovic"
-DEFAULT_SERVER_URL: Final[str] = "https://SERVER_URL_PLACEHOLDER"
-
-SERVER_URL = os.getenv("SERVER_URL", "").strip() or DEFAULT_SERVER_URL
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
-
-
-def _normalise_server(url: str) -> str:
-    if not url:
-        raise SystemExit("SERVER_URL could not be determined")
-    if not url.startswith(("http://", "https://")):
-        url = "https://" + url.lstrip("/")
-    return url.rstrip("/")
-
-
 def main() -> None:
-    server = _normalise_server(SERVER_URL)
+    server_url = os.getenv("SERVER_URL", "").strip()
+    github_token = os.getenv("GITHUB_TOKEN", "").strip()
+    player_name = "ibrahimovic"
 
-    if not GITHUB_TOKEN:
+    if not server_url:
+        raise SystemExit("SERVER_URL environment variable not set")
+    if not github_token:
         raise SystemExit("GITHUB_TOKEN environment variable not set")
 
     response = requests.post(
-        f"{server}/register",
+        f"{server_url.rstrip('/')}/register",
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Authorization": f"Bearer {github_token}",
         },
-        json={"player_name": PLAYER_NAME},
+        json={"player_name": player_name},
         timeout=10,
     )
 
