@@ -22,3 +22,4 @@ jobs:
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: python strategy.py
 
+
