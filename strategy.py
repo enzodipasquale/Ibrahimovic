@@ -9,7 +9,7 @@ import requests
 PLAYER_NAME = "ibrahimovic"
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-PLAYER_ID = os.getenv("PLAYER_ID")
+PLAYER_ID = "ibrahimovic"
 
 if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
