@@ -9,6 +9,7 @@ import requests
 PLAYER_NAME = "ibrahimovic"
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+PLAYER_ID = os.getenv("PLAYER_ID")
 
 if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
@@ -29,10 +30,14 @@ def main() -> None:
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
+    payload = {"action": action}
+    if PLAYER_ID:
+        payload["player_id"] = PLAYER_ID
+
     submission = requests.post(
         f"{SERVER_URL}/action",
         headers=headers,
-        json={"action": action},
+        json=payload,
         timeout=10,
     )
     try:
