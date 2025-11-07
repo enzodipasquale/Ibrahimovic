@@ -8,31 +8,29 @@ import requests
 def main() -> None:
     server_url = os.getenv("SERVER_URL", "").strip()
     github_token = os.getenv("GITHUB_TOKEN", "").strip()
-    player_name = "ibrahimovic"
 
     if not server_url:
         raise SystemExit("SERVER_URL environment variable not set")
     if not github_token:
         raise SystemExit("GITHUB_TOKEN environment variable not set")
 
-    response = requests.post(
-        f"{server_url.rstrip('/')}/register",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {github_token}",
-        },
-        json={"player_name": player_name},
-        timeout=10,
-    )
+    try:
+        response = requests.post(
+            f"{server_url.rstrip('/')}/register",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {github_token}",
+            },
+            json={"player_name": "ibrahimovic"},
+            timeout=10,
+        )
+    except Exception as exc:
+        raise SystemExit(f"Registration error: {exc}") from exc
 
-    response.raise_for_status()
-    print(response.json())
+    if not response.ok:
+        raise SystemExit(f"Registration failed: {response.status_code} {response.text}")
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as exc:  # pragma: no cover - CLI helper
-        print(f"❌ Registration error: {exc}")
-        sys.exit(1)
+    main()
 
