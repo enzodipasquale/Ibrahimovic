@@ -23,9 +23,21 @@ jobs:
         import os
         import urllib.request
 
-        token = os.environ["GAME_TOKEN"]
-        url = os.environ["SERVER_URL"].rstrip("/") + "/register"
-        data = json.dumps({"player_name": os.environ["PLAYER_NAME"]}).encode()
+        token = os.environ.get("GAME_TOKEN", "").strip()
+        server = os.environ.get("SERVER_URL", "").strip()
+        player = os.environ["PLAYER_NAME"]
+
+        if not token:
+            raise SystemExit("GAME_TOKEN secret not set")
+
+        if not server:
+            raise SystemExit("SERVER_URL secret not set")
+
+        if not server.startswith(("http://", "https://")):
+            server = "https://" + server.lstrip("/")
+
+        url = server.rstrip("/") + "/register"
+        data = json.dumps({"player_name": player}).encode()
 
         req = urllib.request.Request(
             url,
