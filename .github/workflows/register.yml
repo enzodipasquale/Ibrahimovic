@@ -1,6 +1,8 @@
 name: Register Player
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -8,49 +10,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    - name: Register Ibrahimovic
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Register Player
       env:
-        GAME_TOKEN: ${{ secrets.GAME_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
-        PLAYER_NAME: ibrahimovic
       run: |
-        python - <<'PY'
-        import json
+        echo "🦁 Registering Ibrahimovic player"
+        python -c "
+        import requests
         import os
-        import urllib.request
 
-        token = os.environ.get("GAME_TOKEN", "").strip()
-        server = os.environ.get("SERVER_URL", "").strip()
-        player = os.environ["PLAYER_NAME"]
+        PLAYER_NAME = 'ibrahimovic'
+        GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+        SERVER_URL = os.getenv('SERVER_URL')
 
-        if not token:
-            raise SystemExit("GAME_TOKEN secret not set")
+        try:
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {GITHUB_TOKEN}'
+            }
+            data = {'player_name': PLAYER_NAME}
 
-        if not server:
-            raise SystemExit("SERVER_URL secret not set")
+            response = requests.post(f'{SERVER_URL}/register',
+                                   headers=headers,
+                                   json=data,
+                                   timeout=10)
 
-        if not server.startswith(("http://", "https://")):
-            server = "https://" + server.lstrip("/")
-
-        url = server.rstrip("/") + "/register"
-        data = json.dumps({"player_name": player}).encode()
-
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}",
-            },
-            method="POST",
-        )
-
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            print(resp.read().decode())
-        PY
+            if response.status_code == 200:
+                result = response.json()
+                print(f'✅ Player registered: {result}')
+            else:
+                print(f'❌ Registration failed: {response.status_code} - {response.text}')
+        except Exception as e:
+            print(f'❌ Registration error: {e}')
+        "
 
 
