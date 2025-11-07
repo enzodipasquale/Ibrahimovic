@@ -45,7 +45,7 @@ jobs:
             }
             data = {'player_name': PLAYER_NAME}
 
-            response = requests.post(f'{SERVER_URL.rstrip('/')}/register',
+            response = requests.post(f"{SERVER_URL.rstrip('/')}/register",
                                    headers=headers,
                                    json=data,
                                    timeout=10)
