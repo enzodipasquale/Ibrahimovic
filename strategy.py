@@ -6,10 +6,9 @@ from typing import Any, Dict
 import requests
 
 
-PLAYER_NAME = "ibrahimovic"
+PLAYER_NAME = os.getenv("PLAYER_NAME", "ibrahimovic")
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-PLAYER_ID = os.getenv("PLAYER_ID")
 
 if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
@@ -42,8 +41,6 @@ def main() -> None:
     payload = {"action": action}
     if PLAYER_NAME:
         payload["player_name"] = PLAYER_NAME
-    if PLAYER_ID:
-        payload["player_id"] = PLAYER_ID
 
     print("[strategy] Submitting payload:", payload)
 
