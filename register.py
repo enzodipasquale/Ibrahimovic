@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
 import os
-import sys
-
 import requests
 
 
 def main() -> None:
-    server_url = os.getenv("SERVER_URL", "https://SERVER_URL_PLACEHOLDER").rstrip("/")
+    server_url = os.getenv("SERVER_URL", "").strip()
     github_token = os.getenv("GITHUB_TOKEN", "").strip()
 
+    print(
+        f"[register] Config state: SERVER_URL={'set' if server_url else 'missing'}, "
+        f"GITHUB_TOKEN={'set' if github_token else 'missing'}",
+        flush=True,
+    )
+
+    if not server_url:
+        raise SystemExit("SERVER_URL environment variable not set")
     if not github_token:
         raise SystemExit("GITHUB_TOKEN environment variable not set")
+
+    if not server_url.startswith(("http://", "https://")):
+        raise SystemExit(f"SERVER_URL must include scheme (http/https); got '{server_url}'")
+
+    server_url = server_url.rstrip("/")
+    print(f"[register] Using endpoint {server_url}/register", flush=True)
 
     try:
         response = requests.post(
