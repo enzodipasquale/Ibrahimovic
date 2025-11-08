@@ -6,7 +6,7 @@ import requests
 
 
 PLAYER_NAME = os.getenv("PLAYER_NAME", "ibrahimovic")
-SERVER_URL = "https://game-platform-v2-914970891924.us-central1.run.app"
+SERVER_URL = os.getenv("SERVER_URL", "https://game-platform-v2-914970891924.us-central1.run.app")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
