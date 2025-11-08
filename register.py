@@ -5,10 +5,8 @@ import sys
 import requests
 
 
-SERVER_URL = "https://SERVER_URL_PLACEHOLDER"
-
-
 def main() -> None:
+    server_url = os.getenv("SERVER_URL", "https://SERVER_URL_PLACEHOLDER").rstrip("/")
     github_token = os.getenv("GITHUB_TOKEN", "").strip()
 
     if not github_token:
@@ -16,7 +14,7 @@ def main() -> None:
 
     try:
         response = requests.post(
-            f"{SERVER_URL}/register",
+            f"{server_url}/register",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {github_token}",
