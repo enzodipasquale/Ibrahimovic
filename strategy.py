@@ -1,39 +1,34 @@
 #!/usr/bin/env python3
 import os
-import random
 from typing import Any, Dict, List
 
+import numpy as np
 import requests
 
 
-PLAYER_NAME = os.getenv("PLAYER_NAME", "ibrahimovic")
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
-def random_direction() -> str:
-    return random.choice(["0", "1", "2"])
-
-
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     players = state.get("players") or []
-    self_name = (PLAYER_NAME or "").lower()
+    opponents: List[str] = [
+        str(player.get("player_id") or player.get("playerId"))
+        for player in players
+        if player.get("player_id") or player.get("playerId")
+    ]
 
-    opponent_ids: List[str] = []
-    for player in players:
-        pid = player.get("player_id") or player.get("playerId")
-        name = (player.get("player_name") or player.get("playerName") or "").lower()
-        if not pid or (self_name and name == self_name):
-            continue
-        opponent_ids.append(str(pid))
+    if not opponents:
+        direction = str(np.random.randint(0, 3))
+        return {"shoot": {"*": direction}, "keep": {"*": direction}}
 
-    shoot = {pid: random_direction() for pid in opponent_ids}
-    keep = {pid: random_direction() for pid in opponent_ids}
-    if not shoot:
-        direction = random_direction()
-        shoot["*"] = direction
-        keep["*"] = direction
-    return {"shoot": shoot, "keep": keep}
+    shoot_dirs = np.random.randint(0, 3, len(opponents))
+    keep_dirs = np.random.randint(0, 3, len(opponents))
+
+    return {
+        "shoot": {pid: str(direction) for pid, direction in zip(opponents, shoot_dirs)},
+        "keep": {pid: str(direction) for pid, direction in zip(opponents, keep_dirs)},
+    }
 
 
 def main() -> None:
@@ -48,14 +43,10 @@ def main() -> None:
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-    payload = {"action": action}
-    if PLAYER_NAME:
-        payload["player_name"] = PLAYER_NAME
-
     response = requests.post(
         f"{SERVER_URL}/action",
         headers=headers,
-        json=payload,
+        json={"action": action},
         timeout=10,
     )
 
