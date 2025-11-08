@@ -6,11 +6,8 @@ import requests
 
 
 PLAYER_NAME = os.getenv("PLAYER_NAME", "ibrahimovic")
-SERVER_URL = os.getenv("SERVER_URL")
+SERVER_URL = "https://SERVER_URL_PLACEHOLDER"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-if not SERVER_URL:
-    raise SystemExit("SERVER_URL env var required")
 
 
 def strategy(state):
@@ -34,12 +31,16 @@ def main():
     if PLAYER_NAME:
         payload["player_name"] = PLAYER_NAME
 
-    requests.post(
+    response = requests.post(
         f"{SERVER_URL}/action",
         headers=headers,
         json=payload,
         timeout=10,
-    ).raise_for_status()
+    )
+
+    if not response.ok:
+        detail = response.text or response.reason
+        raise SystemExit(f"Submission failed: {response.status_code} {detail}")
 
 
 if __name__ == "__main__":
