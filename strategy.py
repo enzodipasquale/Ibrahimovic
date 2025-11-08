@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import random
-from typing import Dict, List
 
 import requests
 
@@ -14,42 +13,33 @@ if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
 
 
-def random_sequence(length: int) -> str:
+def strategy(state):
+    rounds = ((state.get("gameState") or {}).get("state") or [])
+    latest = rounds[-1] if rounds else {}
+    players = list(latest.keys()) if isinstance(latest, dict) else []
+    length = len(players) or 1
     return "".join(random.choice("012") for _ in range(length))
 
 
-def extract_players(state: Dict) -> List[str]:
-    game_state = state.get("gameState") or state.get("state") or {}
-    if isinstance(game_state, dict):
-        return list(game_state.keys())
-    if isinstance(game_state, list):
-        return [player.get("player_id") or player.get("player_name") for player in game_state]
-    return []
-
-
-def main() -> None:
-    status_response = requests.get(f"{SERVER_URL}/status", timeout=10)
-    status_response.raise_for_status()
-    status = status_response.json()
-
-    players = extract_players(status)
-    sequence = random_sequence(len(players) or 1)
+def main():
+    status = requests.get(f"{SERVER_URL}/status", timeout=10)
+    status.raise_for_status()
+    action = strategy(status.json())
 
     headers = {"Content-Type": "application/json"}
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-    payload = {"action": sequence}
+    payload = {"action": action}
     if PLAYER_NAME:
         payload["player_name"] = PLAYER_NAME
 
-    submission = requests.post(
+    requests.post(
         f"{SERVER_URL}/action",
         headers=headers,
         json=payload,
         timeout=10,
-    )
-    submission.raise_for_status()
+    ).raise_for_status()
 
 
 if __name__ == "__main__":
