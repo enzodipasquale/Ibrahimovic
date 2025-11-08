@@ -15,22 +15,18 @@ def random_direction() -> str:
     return random.choice(["0", "1", "2"])
 
 
-def extract_opponent_ids(status: Dict[str, Any], self_name: str) -> List[str]:
-    players = status.get("players") or []
-    ids: List[str] = []
+def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
+    players = state.get("players") or []
+    self_name = (PLAYER_NAME or "").lower()
+
+    opponent_ids: List[str] = []
     for player in players:
         pid = player.get("player_id") or player.get("playerId")
-        name = player.get("player_name") or player.get("playerName")
-        if not pid:
+        name = (player.get("player_name") or player.get("playerName") or "").lower()
+        if not pid or (self_name and name == self_name):
             continue
-        if name and name.lower() == (self_name or "").lower():
-            continue
-        ids.append(str(pid))
-    return ids
+        opponent_ids.append(str(pid))
 
-
-def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
-    opponent_ids = extract_opponent_ids(state, PLAYER_NAME or "")
     shoot = {pid: random_direction() for pid in opponent_ids}
     keep = {pid: random_direction() for pid in opponent_ids}
     if not shoot:
