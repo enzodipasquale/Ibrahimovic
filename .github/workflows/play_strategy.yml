@@ -1,7 +1,9 @@
-name: Play Strategy (Manual)
+name: Manual Strategy (Ibrahimovic)
 
 on:
   workflow_dispatch:
+
+run-name: Manual Strategy Run
 
 jobs:
   play:
