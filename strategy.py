@@ -8,6 +8,7 @@ import requests
 
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+PLAYER_NAME = "ibrahimovic"
 
 
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
@@ -43,10 +44,14 @@ def main() -> None:
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
+    payload = {"action": action}
+    if PLAYER_NAME:
+        payload["player_name"] = PLAYER_NAME
+
     response = requests.post(
         f"{SERVER_URL}/action",
         headers=headers,
-        json={"action": action},
+        json=payload,
         timeout=10,
     )
 
