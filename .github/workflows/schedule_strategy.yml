@@ -5,7 +5,7 @@ on:
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
-run-name: Scheduled Strategy Run
+run-name: Scheduled Strategy (Ibrahimovic)
 
 jobs:
   play:
@@ -31,7 +31,7 @@ jobs:
         if [ "${{ vars.ENABLE_SCHEDULE }}" = "true" ]; then
           echo "enabled=true" >> "$GITHUB_OUTPUT"
         else
-          echo "Schedule disabled. Set ENABLE_SCHEDULE repo variable to \"true\" to enable."
+          echo "::notice::Schedule disabled. Set ENABLE_SCHEDULE repo variable to \"true\" to enable."
           echo "enabled=false" >> "$GITHUB_OUTPUT"
         fi
 
@@ -45,26 +45,3 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: python strategy.py
-name: Schedule Strategy
-
-on:
-  schedule:
-    - cron: '*/10 * * * *'
-
-jobs:
-  play:
-    continue-on-error: true
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - run: pip install requests
-    - name: Run strategy
-      env:
-        GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
-        SERVER_URL: ${{ secrets.SERVER_URL }}
-      run: python strategy.py
-
