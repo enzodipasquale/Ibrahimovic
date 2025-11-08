@@ -6,6 +6,11 @@ import numpy as np
 import requests
 
 
+PLAYER_NAME = "ibrahimovic"
+SERVER_URL = os.getenv("SERVER_URL")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
     opponents = _resolve_opponents(state, PLAYER_NAME)
     if not opponents:
