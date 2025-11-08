@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+from urllib.parse import urlparse
+
 import requests
 
 
@@ -20,6 +22,11 @@ def main() -> None:
 
     if not server_url.startswith(("http://", "https://")):
         raise SystemExit(f"SERVER_URL must include scheme (http/https); got '{server_url}'")
+
+    parsed = urlparse(server_url)
+    if parsed.path and parsed.path not in ("", "/"):
+        print(f"[register] Trimming path '{parsed.path}' from SERVER_URL", flush=True)
+        server_url = f"{parsed.scheme}://{parsed.netloc}"
 
     server_url = server_url.rstrip("/")
     print(f"[register] Using endpoint {server_url}/register", flush=True)
