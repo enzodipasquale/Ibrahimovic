@@ -11,24 +11,17 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 PLAYER_NAME = "ibrahimovic"
 
 
-def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
-    players = state.get("players") or []
-    opponents: List[str] = [
-        str(player.get("player_id") or player.get("playerId"))
-        for player in players
-        if player.get("player_id") or player.get("playerId")
-    ]
-
+def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
+    opponents = _resolve_opponents(state, PLAYER_NAME)
     if not opponents:
-        direction = str(np.random.randint(0, 3))
-        return {"shoot": {"*": direction}, "keep": {"*": direction}}
+        raise SystemExit("No opponents found in game state; cannot build payload.")
 
-    shoot_dirs = np.random.randint(0, 3, len(opponents))
-    keep_dirs = np.random.randint(0, 3, len(opponents))
+    shoot_dirs = np.random.randint(0, 3, len(opponents)).tolist()
+    keep_dirs = np.random.randint(0, 3, len(opponents)).tolist()
 
     return {
-        "shoot": {pid: str(direction) for pid, direction in zip(opponents, shoot_dirs)},
-        "keep": {pid: str(direction) for pid, direction in zip(opponents, keep_dirs)},
+        "shoot": {pid: int(direction) for pid, direction in zip(opponents, shoot_dirs)},
+        "keep": {pid: int(direction) for pid, direction in zip(opponents, keep_dirs)},
     }
 
 
@@ -44,9 +37,7 @@ def main() -> None:
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-    payload = {"action": action}
-    if PLAYER_NAME:
-        payload["player_name"] = PLAYER_NAME
+    payload = {"action": action, "player_name": PLAYER_NAME}
 
     response = requests.post(
         f"{SERVER_URL}/action",
@@ -62,3 +53,31 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def _resolve_opponents(state: Dict[str, Any], player_name: str) -> List[str]:
+    participants: set[str] = set()
+
+    for name in state.get("playerNames") or []:
+        if name:
+            participants.add(str(name))
+
+    for round_entry in state.get("state") or []:
+        if not isinstance(round_entry, dict):
+            continue
+        for shooter, actions in round_entry.items():
+            if shooter:
+                participants.add(str(shooter))
+            if isinstance(actions, dict):
+                for role in ("shoot", "keep"):
+                    for opponent in (actions.get(role) or {}).keys():
+                        if opponent:
+                            participants.add(str(opponent))
+
+    if not participants:
+        raise SystemExit("No players present in game state; cannot submit action.")
+
+    if player_name not in participants:
+        raise SystemExit(f"Could not find player '{player_name}' in /status response.")
+
+    return sorted(pid for pid in participants if pid != player_name)
