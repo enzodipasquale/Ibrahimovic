@@ -12,7 +12,11 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
-    player_map = state.get("playerNames") or {}
+    player_map = (
+        state.get("playerNames")
+        or state.get("playerMap")
+        or {}
+    )
     self_id = player_map.get(PLAYER_NAME)
     opponents = [pid for name, pid in player_map.items() if name != PLAYER_NAME]
 
