@@ -1,12 +1,10 @@
-name: Schedule Strategy
+name: Play Strategy (Manual)
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'
+  workflow_dispatch:
 
 jobs:
   play:
-    continue-on-error: true
     runs-on: ubuntu-latest
 
     steps:
@@ -20,4 +18,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: python strategy.py
+
 
