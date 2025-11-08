@@ -35,6 +35,7 @@ def main() -> None:
     status = requests.get(
         f"{SERVER_URL}/status",
         headers={"Authorization": f"Bearer {GITHUB_TOKEN}"},
+        params={"player_name": PLAYER_NAME},
         timeout=10,
     )
     status.raise_for_status()
