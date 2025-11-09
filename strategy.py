@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import numpy as np
 import requests
@@ -12,9 +12,9 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
-    player_map = state.get("playerMap") or {}
-    self_id = player_map.get(PLAYER_NAME)
-    opponents = [pid for name, pid in player_map.items() if name != PLAYER_NAME]
+    self_id = state.get("myPlayerId")
+    player_ids = state.get("playerIds") or []
+    opponents = [pid for pid in player_ids if pid != self_id]
 
     if not self_id or not opponents:
         return {"shoot": {}, "keep": {}}
