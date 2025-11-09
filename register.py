@@ -6,11 +6,18 @@ import requests
 
 
 def main() -> None:
-    server_url = os.getenv("SERVER_URL", "https://SERVER_URL_PLACEHOLDER").rstrip("/")
+    server_url = os.getenv("SERVER_URL", "").strip()
     github_token = os.getenv("GITHUB_TOKEN", "").strip()
 
     if not github_token:
         raise SystemExit("GITHUB_TOKEN environment variable not set")
+    if not server_url:
+        raise SystemExit("SERVER_URL environment variable not set")
+
+    if not server_url.startswith(("http://", "https://")):
+        raise SystemExit(f"SERVER_URL must include scheme (http/https); got '{server_url}'")
+
+    server_url = server_url.rstrip("/")
 
     try:
         response = requests.post(
