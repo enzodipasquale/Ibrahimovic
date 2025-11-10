@@ -14,10 +14,19 @@ Before running, set:
 - `SERVER_URL` – base URL of the game platform
 - `GITHUB_TOKEN` – optional locally, required for authenticated calls
 
-## Continuous Play
-Two GitHub Actions in `.github/workflows/` mirror other players:
-- `register.yml` registers the player on each push
-- `penalty-shootout-manual.yml` triggers a manual penalty session
+## Registering the Player
+```bash
+export SERVER_URL="https://SERVER_URL_PLACEHOLDER"
+export GITHUB_TOKEN="ghp_example123"
+PLAYER_NAME="ibrahimovic"
+curl -sS -X POST "$SERVER_URL/register" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -d "{\"player_name\":\"${PLAYER_NAME}\"}"
+```
 
-Add the required secrets (`GAME_TOKEN`, `SERVER_URL`, `GITHUB_TOKEN`) once you create a GitHub token for this repo.
+The JSON response echoes the player name and includes the `player_id` assigned by the server.
+
+## Continuous Play
+`.github/workflows/schedule_strategy.yml` submits a turn every 5 minutes (and can be dispatched manually). Populate `GAME_TOKEN` and `SERVER_URL` secrets before enabling it.
 
