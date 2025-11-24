@@ -8,18 +8,18 @@ import requests
 
 def main() -> None:
     server_url = os.getenv("SERVER_URL", "").strip()
-    github_token = os.getenv("GITHUB_TOKEN", "").strip()
+    github_token = os.getenv("GAME_TOKEN", "").strip()
 
     print(
         f"[register] Config state: SERVER_URL={'set' if server_url else 'missing'}, "
-        f"GITHUB_TOKEN={'set' if github_token else 'missing'}",
+        f"GAME_TOKEN={'set' if github_token else 'missing'}",
         flush=True,
     )
 
     if not server_url:
         raise SystemExit("SERVER_URL environment variable not set")
     if not github_token:
-        raise SystemExit("GITHUB_TOKEN environment variable not set")
+        raise SystemExit("GAME_TOKEN environment variable not set")
 
     if not server_url.startswith(("http://", "https://")):
         raise SystemExit(f"SERVER_URL must include scheme (http/https); got '{server_url}'")
