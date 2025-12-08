@@ -7,8 +7,10 @@ import requests
 
 
 def main() -> None:
+    # Workflows and local runs both rely on these secrets.
     server_url = os.getenv("SERVER_URL", "").strip()
-    github_token = os.getenv("GAME_TOKEN", "").strip()
+    game_token = os.getenv("GAME_TOKEN", "").strip()
+    player_name = os.getenv("PLAYER_NAME", "").strip()
     
     # Required fields for automated workflow triggering
     # GITHUB_REPOSITORY is automatically set by GitHub Actions (format: "owner/repo")
@@ -16,9 +18,11 @@ def main() -> None:
     github_repo = os.getenv("GITHUB_REPOSITORY", os.getenv("GITHUB_REPO", "")).strip()
     github_workflow_name = os.getenv("GITHUB_WORKFLOW_NAME", "").strip()  # Default: "play-game.yml"
 
+    # Print what we know without leaking actual secrets.
     print(
         f"[register] Config state: SERVER_URL={'set' if server_url else 'missing'}, "
-        f"GAME_TOKEN={'set' if github_token else 'missing'}, "
+        f"GAME_TOKEN={'set' if game_token else 'missing'}, "
+        f"PLAYER_NAME={'set' if player_name else 'missing'}, "
         f"GITHUB_REPO={'set' if github_repo else 'missing'}",
         flush=True,
     )
@@ -32,19 +36,22 @@ def main() -> None:
 
     if not server_url:
         raise SystemExit("SERVER_URL environment variable not set")
-    if not github_token:
+    if not game_token:
         raise SystemExit("GAME_TOKEN environment variable not set")
+    if not player_name:
+        raise SystemExit("PLAYER_NAME environment variable not set")
 
     if not server_url.startswith(("http://", "https://")):
         raise SystemExit(f"SERVER_URL must include scheme (http/https); got '{server_url}'")
 
+    # Normalise the base URL before appending the path.
     server_url = server_url.rstrip("/")
     print(f"[register] Using endpoint {server_url}/register", flush=True)
 
     # Build registration payload
     # Note: GAME_TOKEN from Authorization header will be used for both auth and triggering
     registration_data = {
-        "player_name": "ibrahimovic",
+        "player_name": player_name,
         "github_repo": github_repo,
     }
     
@@ -59,11 +66,13 @@ def main() -> None:
             f"{server_url}/register",
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {github_token}",
+                "Authorization": f"Bearer {game_token}",
             },
             json=registration_data,
             timeout=10,
         )
+    except Exception as exc:  # pragma: no cover - network failure path
+        raise SystemExit(f"Registration error: {exc}") from exc
     except Exception as exc:
         raise SystemExit(f"Registration error: {exc}") from exc
 
