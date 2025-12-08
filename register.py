@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """CLI helper for registering this template player with the penalty shootout server."""
 import os
-import sys
 
 import requests
 
@@ -72,8 +71,6 @@ def main() -> None:
             timeout=10,
         )
     except Exception as exc:  # pragma: no cover - network failure path
-        raise SystemExit(f"Registration error: {exc}") from exc
-    except Exception as exc:
         raise SystemExit(f"Registration error: {exc}") from exc
 
     if not response.ok:
