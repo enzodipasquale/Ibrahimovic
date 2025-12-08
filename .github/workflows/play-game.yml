@@ -26,5 +26,5 @@ jobs:
         GAME_TOKEN: ${{ secrets.GAME_TOKEN }}
         PLAYER_NAME: ${{ secrets.PLAYER_NAME }}
         GITHUB_REPO: ${{ github.repository }}
-      run: python register.py
+      run: python strategy.py
 
