@@ -24,7 +24,7 @@ jobs:
       env:
         SERVER_URL: ${{ secrets.SERVER_URL }}
         GAME_TOKEN: ${{ secrets.GAME_TOKEN }}
-        PLAYER_NAME: ${{ secrets.PLAYER_NAME }}
+        PLAYER_NAME: ibrahimovic
         GITHUB_REPO: ${{ github.repository }}
       run: python register.py
 
